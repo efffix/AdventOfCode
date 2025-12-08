@@ -1,4 +1,5 @@
 import time
+import heapq
 INPUT = "input.txt"
 start_time = time.perf_counter()
 points_distance = []
@@ -7,10 +8,7 @@ def find_closest(id, matrix):
     (x, y, z) = matrix[id]
     for r in range(id+1, len(matrix)):
         dist = abs(matrix[r][0] - x)**2 + abs(matrix[r][1] - y)**2 + abs(matrix[r][2] - z)**2
-        points_distance.append((dist, id, r))
-        
-
-
+        heapq.heappush(points_distance, (dist, id, r))      
 
 try:
     with open(INPUT, 'r') as file:
@@ -22,14 +20,13 @@ try:
         for i in range(len(coords)):
             find_closest(i, coords)
 
-        points_distance.sort(key=lambda x: x[0])
         clusters = []
         main_cluster = set()
         main_cluster.add(points_distance[0][1])
         main_cluster.add(points_distance[0][2])
 
         for p in range(len(points_distance)):
-            (d, a, b) = points_distance[p]
+            (d, a, b) = heapq.heappop(points_distance)
             add_to_main = False
             current_cluster = None
             if a in main_cluster or b in main_cluster:
@@ -61,8 +58,7 @@ try:
             clusters.append(current_cluster)
             if len(main_cluster) == len(coords):
                 print("All points clustered : " + str(coords[a][0] * coords[b][0]))
-                break
-        
+                break        
 
     end_time = time.perf_counter()
     print(f"Execution time: {(end_time - start_time) * 1000} milliseconds")
