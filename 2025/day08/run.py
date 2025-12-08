@@ -1,17 +1,13 @@
 import time
-import math
-MAX_NEIGHBORS = 4
 INPUT = "input.txt"
 start_time = time.perf_counter()
 points_distance = []
 
 def find_closest(id, matrix):
     (x, y, z) = matrix[id]
-    for r in range(id, len(matrix)):
-        if r == id:
-            continue
+    for r in range(id+1, len(matrix)):
         dist = abs(matrix[r][0] - x)**2 + abs(matrix[r][1] - y)**2 + abs(matrix[r][2] - z)**2
-        points_distance.append((id, r, dist))
+        points_distance.append((dist, id, r))
         
 
 
@@ -23,20 +19,17 @@ try:
         for line in file:
             coords.append(list(map(lambda x: int(x), line.strip().split(','))))
         
-        closest_points = [None] * len(coords)
-
         for i in range(len(coords)):
             find_closest(i, coords)
 
-        closest_points = sorted(points_distance, key=lambda x: x[2])
-
+        points_distance.sort(key=lambda x: x[0])
         clusters = []
         main_cluster = set()
-        main_cluster.add(closest_points[0][0])
-        main_cluster.add(closest_points[0][1])
+        main_cluster.add(points_distance[0][1])
+        main_cluster.add(points_distance[0][2])
 
-        for p in range(len(closest_points)):
-            (a, b, d) = closest_points[p]
+        for p in range(len(points_distance)):
+            (d, a, b) = points_distance[p]
             add_to_main = False
             current_cluster = None
             if a in main_cluster or b in main_cluster:
